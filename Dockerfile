@@ -2,16 +2,16 @@
 WORKDIR /app
 
 # copy csproj and restore as distinct layers
-COPY *.sln .
-COPY Catalog/*.csproj ./Catalog/
+
+COPY *.csproj ./
 RUN dotnet restore
 
 # copy everything else and build app
-COPY Catalog/. ./Catalog/
-WORKDIR /app/Catalog
+COPY . ./
 RUN dotnet publish -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/Catalog/out ./
+EXPOSE 80
+COPY --from=build /app/out .
 ENTRYPOINT ["dotnet", "Catalog.dll"]
